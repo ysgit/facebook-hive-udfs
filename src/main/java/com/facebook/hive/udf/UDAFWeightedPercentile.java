@@ -138,17 +138,17 @@ public class UDAFWeightedPercentile extends UDAF {
 
     public boolean iterate(LongWritable o, DoubleWritable w, 
                            List<DoubleWritable> percentiles) {
-      if (state.percentiles == null) {
-        for (int i = 0; i < percentiles.size(); i++) {
-          if (percentiles.get(i).get() < 0.0 ||
-              percentiles.get(i).get() > 1.0) {
+      if (state.percentiles == null && percentiles != null) {
+        for (DoubleWritable percentile : percentiles) {
+          if (percentile.get() < 0.0 ||
+                  percentile.get() > 1.0) {
             throw new RuntimeException("Percentile value must be in [0,1]");
           }
         }
         state.percentiles = new ArrayList<DoubleWritable>(percentiles);
       }
-      if (o != null) {
-        increment(state, o, 1);
+      if (o != null && w != null) {
+        increment(state, o, w.get());
       }
       return true;
     }
